@@ -108,10 +108,10 @@ public class AddFaceFeatureActivity extends AbsBaseActivity {
              * 人脸检测裁剪完成
              * @param cropped         SDK检测裁剪矫正后的Bitmap，20260227版本统一大小为224*224
              * @param silentScore     静默活体分数(摄像头品质有关)，needLivenessCheck=true才有值
-             * @param originBitmap    640*480 原图
+             * @param origin          640*480 原图
              */
             @Override
-            public void onCompleted(Bitmap cropped, float silentScore,Bitmap originBitmap) {
+            public void onCompleted(Bitmap cropped, float silentScore,Bitmap origin) {
                 isConfirmAdd=true;
                 //提取人脸特征值,从已经经过SDK裁剪好的Bitmap中提取人脸特征值
                 //如果非SDK相机录入的人脸照片提取特征值用异步方法 Image2FaceFeature.getInstance(this).getFaceFeatureByBitmap
@@ -124,13 +124,13 @@ public class AddFaceFeatureActivity extends AbsBaseActivity {
                     }
                     //明确指示不需要弹窗确认，并且faceID指定了
                     if (addFaceType.equals(AddFaceImageTypeEnum.FACE_VERIFY.name())) {
-                        saveFaceVerifyData(originBitmap,faceID,faceFeature);
+                        saveFaceVerifyData(cropped,faceID,faceFeature);
                     } else {
-                        saveFaceSearchData(originBitmap,faceID,faceFeature);
+                        saveFaceSearchData(cropped,faceID,faceFeature);
                     }
                     finishAddFace(1, "Add face success",faceFeature);
                 }else{
-                    confirmAddFaceDialog(originBitmap,faceFeature);
+                    confirmAddFaceDialog(cropped,faceFeature,origin);
                 }
             }
 
@@ -235,19 +235,19 @@ public class AddFaceFeatureActivity extends AbsBaseActivity {
     /**
      * 经过SDK裁剪矫正处理好的bitmap 转为人脸特征值
      *
-     * @param originBitmap 符合对应参数设置的SDK裁剪好的人脸图
+     * @param bitmap 符合对应参数设置的SDK裁剪好的人脸图
      */
-    private void confirmAddFaceDialog(Bitmap originBitmap,String faceFeature) {
+    private void confirmAddFaceDialog(Bitmap bitmap,String faceFeature,Bitmap originBitmap) {
         ConfirmFaceDialog confirmFaceDialog=new ConfirmFaceDialog(this,originBitmap);
 
         confirmFaceDialog.btnConfirm.setOnClickListener(v -> {
             faceID = confirmFaceDialog.faceIDEdit.getText().toString();
             if (!TextUtils.isEmpty(faceID)) {
                 if (addFaceType.equals(AddFaceImageTypeEnum.FACE_VERIFY.name())) {
-                    saveFaceVerifyData(originBitmap,faceID,faceFeature);
+                    saveFaceVerifyData(bitmap,faceID,faceFeature);
                     finishConfirm(confirmFaceDialog.dialog, faceFeature);
                 } else {
-                    saveFaceSearchData(originBitmap,faceID,faceFeature);
+                    saveFaceSearchData(bitmap,faceID,faceFeature);
                     finishConfirm(confirmFaceDialog.dialog, faceFeature);
                 }
             } else {
