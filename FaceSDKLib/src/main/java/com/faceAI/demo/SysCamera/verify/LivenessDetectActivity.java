@@ -48,6 +48,7 @@ public class LivenessDetectActivity extends AbsBaseActivity {
     public static final String MOTION_TIMEOUT = "MOTION_TIMEOUT";   //动作活体超时数据
     public static final String MOTION_LIVENESS_TYPES = "MOTION_LIVENESS_TYPES"; //动作活体种类
     public static final String ALLOW_MULTI_FACES = "ALLOW_MULTI_FACES"; //是否允许有多人出现在镜头Key
+    public static final String SHOW_RESULT_TIPS = "SHOW_RESULT_TIPS"; //是否显示结果提示还是留给插件调用方处理
     private  boolean allowMultiFaces = true; //是否允许有多人出现在镜头
     private int retryTime = 0; //记录失败尝试的次数
 
@@ -55,18 +56,20 @@ public class LivenessDetectActivity extends AbsBaseActivity {
     //静默活体效果和摄像头成像有关，炫彩活体不能在强光下使用
     private FaceLivenessType faceLivenessType = FaceLivenessType.COLOR_FLASH_MOTION;  //活体检测类型建议MOTION或COLOR_FLASH_MOTION
     private int motionStepSize = 2; //动作活体的个数
+    private boolean showResultTips = true; //是否显示结果提示
+
     private int motionTimeOut = 3*motionStepSize;  //动作超时秒，低端机可以设置长一点
     private String motionLivenessTypes = "1,2,3,4,5"; //【配置动作活体类型】1.张张嘴 2.微笑 3.眨眨眼 4.摇头 5.点头
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideSystemUI();//炫彩活体全屏显示各种颜色
+        hideSystemUI(); //全屏
         setContentView(R.layout.activity_liveness_detection);
         faceCoverView = findViewById(R.id.face_cover);
         findViewById(R.id.back).setOnClickListener(v -> finishFaceVerify(DEFAULT, R.string.face_verify_result_cancel));
 
-        getIntentParams();    //接收三方插件的参数 数据
+        getIntentParams(); //接收三方插件的参数 数据
 
         MMKV mmkv = MMKV.defaultMMKV();
         int cameraLensFacing = mmkv.decodeInt(FRONT_BACK_CAMERA_FLAG, 0);
@@ -88,10 +91,9 @@ public class LivenessDetectActivity extends AbsBaseActivity {
     }
 
     /**
-     * 初始化认证引擎
+     * 初始化活体检测参数配置
      */
     private void initLivenessParam() {
-        //建议老的低配设备减少活体检测步骤
         FaceProcessBuilder faceProcessBuilder = new FaceProcessBuilder.Builder(this)
                 .setLivenessOnly(true)
                 .setLivenessType(faceLivenessType)         //活体检测可以炫彩&动作活体组合，炫彩活体不能在强光下使用
@@ -109,14 +111,18 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                      */
                     @Override
                     public void onLivenessDetected(float livenessValue, Bitmap bitmap) {
-                        BitmapUtils.saveCompressBitmap(bitmap, CACHE_FACE_LOG_DIR, "liveBitmap");
+                        BitmapUtils.saveCompressBitmap(bitmap, CACHE_FACE_LOG_DIR, "liveBitmap");//保存Log记录，注意及时上传日志
                         if(livenessValue>0.81){
-                            TTSPlayer.getInstance().playTTS(R.string.face_verify_success);
-                            new ImageToast().show(getApplicationContext(), getString(R.string.face_verify_success));
+                            if(showResultTips){ //三方插件自行提示还是默认
+                                TTSPlayer.getInstance().playTTS(R.string.liveness_detection_done);
+                                new ImageToast().show(getApplicationContext(), getString(R.string.liveness_detection_done));
+                            }
                             finishFaceVerify(ALL_LIVENESS_SUCCESS, R.string.liveness_detection_done, livenessValue);
                         }else{
-                            TTSPlayer.getInstance().playTTS(R.string.silent_anti_spoofing_error);
-                            new ImageToast().show(getApplicationContext(), getString(R.string.silent_anti_spoofing_error));
+                            if(showResultTips){ //三方插件自行提示还是默认
+                                TTSPlayer.getInstance().playTTS(R.string.silent_anti_spoofing_error);
+                                new ImageToast().show(getApplicationContext(), getString(R.string.silent_anti_spoofing_error));
+                            }
                             finishFaceVerify(SILENT_LIVENESS_FAILED, R.string.silent_anti_spoofing_error, livenessValue);
                         }
                     }
@@ -395,6 +401,10 @@ public class LivenessDetectActivity extends AbsBaseActivity {
             if (intent.hasExtra(MOTION_LIVENESS_TYPES)) {
                 motionLivenessTypes = intent.getStringExtra(MOTION_LIVENESS_TYPES);
             }
+            if (intent.hasExtra(SHOW_RESULT_TIPS)) {
+                showResultTips = intent.getBooleanExtra(SHOW_RESULT_TIPS,true);
+            }
+
         }
     }
 
