@@ -6,8 +6,8 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        versionCode 20260528
-        versionName "20260528"
+        versionCode 20260621
+        versionName "20260621"
         applicationId "com.ai.face.Demo" //Demo App Name
         minSdk 21
         targetSdk 36
@@ -80,6 +80,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
     // Demo 为了收集 Crash，上线google play 删除
     implementation 'com.tencent.bugly:crashreport:4.1.9.3'
 
