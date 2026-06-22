@@ -93,7 +93,7 @@ public class FaceVerificationActivity extends AbsBaseActivity {
 
         CameraXBuilder cameraXBuilder = new CameraXBuilder.Builder()
                 .setCameraLensFacing(cameraLensFacing) //前后摄像头
-                .setLinearZoom(0f)          //焦距范围[0f,1.0f]，根据应用场景自行适当调整焦距（摄像头需支持变焦）炫彩活体请设置为0f
+                .setLinearZoom(0.12f)          //焦距范围[0f,1.0f]，根据应用场景自行适当调整焦距（摄像头需支持变焦）炫彩活体请设置为0f
                 .setRotation(degree)        //画面旋转角度
                 .setCameraSizeHigh(false)   //高分辨率远距离也可以工作，但是性能速度会下降.部分定制设备不支持请工程师调试好
                 .create();
