@@ -224,9 +224,17 @@ public class FaceVerificationActivity extends AbsBaseActivity {
             int code = isVerifyMatched ? SILENT_LIVENESS_FAILED : VERIFY_FAILED;
             TTSPlayer.getInstance().playTTS(R.string.face_verify_failed);
 
-            new AlertDialog.Builder(FaceVerificationActivity.this).setTitle(R.string.face_verify_failed_title).setMessage(R.string.face_verify_failed).setCancelable(false).setPositiveButton(R.string.know, (dialogInterface, i) -> {
-                finishFaceVerify(code, R.string.face_verify_result_failed, similarity,livenessValue);
-            }).setNegativeButton(R.string.retry, (dialog, which) -> faceVerifyUtils.retryVerify()).show();
+            new AlertDialog.Builder(FaceVerificationActivity.this)
+                    .setMessage(R.string.face_verify_result_failed)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
+                        retryTime++;
+                        if (retryTime > 2) {
+                            finishFaceVerify(code, R.string.face_verify_result_failed, similarity,livenessValue);
+                        } else {
+                            faceVerifyUtils.retryVerify();
+                        }
+                    }).show();
         }
     }
 

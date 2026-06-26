@@ -123,7 +123,19 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                                 TTSPlayer.getInstance().playTTS(R.string.silent_anti_spoofing_error);
                                 new ImageToast().show(getApplicationContext(), getString(R.string.silent_anti_spoofing_error));
                             }
-                            finishFaceVerify(SILENT_LIVENESS_FAILED, R.string.silent_anti_spoofing_error, livenessValue);
+
+                            new AlertDialog.Builder(LivenessDetectActivity.this)
+                                    .setMessage(R.string.silent_anti_spoofing_error)
+                                    .setCancelable(false)
+                                    .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
+                                        retryTime++;
+                                        if (retryTime > 2) {
+                                            finishFaceVerify(SILENT_LIVENESS_FAILED, R.string.silent_anti_spoofing_error, livenessValue);
+                                        } else {
+                                            faceVerifyUtils.retryVerify();
+                                        }
+                                    }).show();
+
                         }
                     }
 
