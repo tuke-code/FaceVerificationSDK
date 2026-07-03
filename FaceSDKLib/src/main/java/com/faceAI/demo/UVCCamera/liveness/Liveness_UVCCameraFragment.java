@@ -182,7 +182,7 @@ public class Liveness_UVCCameraFragment extends AbsLiveness_UVCCameraFragment {
                     case NO_FACE_REPEATEDLY:
                         setTips(R.string.no_face_or_repeat_switch_screen);
                         new AlertDialog.Builder(requireActivity())
-                                .setMessage(R.string.stop_verify_tips)
+                                .setMessage(R.string.no_face_repeatedly)
                                 .setCancelable(false)
                                 .setPositiveButton(R.string.confirm, (dialogInterface, i) -> {
                                     requireActivity().finish();

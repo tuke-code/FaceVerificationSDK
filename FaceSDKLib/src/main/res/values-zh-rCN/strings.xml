@@ -97,7 +97,7 @@ Email: FaceAISDK.Service@gmail.com\n\n
     <string name="motion_node_head">请上下点头 </string>
     <string name="motion_liveness_detection_time_out">活体检测超时了 </string>
     <string name="no_face_or_repeat_switch_screen">多次切换画面或无人脸 </string>
-    <string name="stop_verify_tips">停止识别,识别过程请保持人脸在画面中 </string>
+    <string name="no_face_repeatedly">识别过程请保持人脸在画面中 </string>
 
     <!--Navi activity-->
     <string name="camera_degree_set">摄像头方向切换。当前：</string>
