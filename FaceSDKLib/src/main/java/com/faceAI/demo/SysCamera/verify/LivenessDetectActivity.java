@@ -5,7 +5,7 @@ import static com.faceAI.demo.FaceAISettingsActivity.SYSTEM_CAMERA_DEGREE;
 import static com.faceAI.demo.FaceSDKConfig.CACHE_FACE_LOG_DIR;
 
 import static com.faceAI.demo.SysCamera.verify.VerifyStatue.*;
-import android.content.Context;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -97,9 +97,9 @@ public class LivenessDetectActivity extends AbsBaseActivity {
         FaceProcessBuilder faceProcessBuilder = new FaceProcessBuilder.Builder(this)
                 .setLivenessOnly(true)
                 .setLivenessType(faceLivenessType)         //活体检测可以炫彩&动作活体组合，炫彩活体不能在强光下使用
-                .setMotionLivenessStepSize(motionStepSize)  //随机动作活体的步骤个数[1-2]，SILENT_MOTION和MOTION 才有效
-                .setMotionLivenessTimeOut(motionTimeOut)     //动作活体检测，支持设置超时时间 [3,22] 秒 。API 名字0410 修改
                 .setMotionLivenessTypes(motionLivenessTypes)  //动作活体种类。1 张张嘴,2 微笑,3 眨眨眼,4 摇摇头,5 点点头
+                .setMotionLivenessStepSize(motionStepSize)  //从「动作活体种类」随机动作活体的步骤个数[1-2]，SILENT_MOTION和MOTION 才有效
+                .setMotionLivenessTimeOut(motionTimeOut)     //动作活体检测，支持设置超时时间 [3,22] 秒 。API 名字0410 修改
                 .setStopVerifyNoFaceRealTime(false)      //没检测到人脸是否立即停止，还是出现过人脸后检测到无人脸停止.(默认false，为后者)
                 .setProcessCallBack(new ProcessCallBack() {
 
@@ -127,13 +127,13 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                             new AlertDialog.Builder(LivenessDetectActivity.this)
                                     .setMessage(R.string.silent_anti_spoofing_error)
                                     .setCancelable(false)
-                                    .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
-                                        retryTime++;
-                                        if (retryTime > 2) {
+                                    .setPositiveButton(retryTime > 3 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                                        if (retryTime > 3) {
                                             finishFaceVerify(SILENT_LIVENESS_FAILED, R.string.silent_anti_spoofing_error, livenessValue);
                                         } else {
                                             faceVerifyUtils.retryVerify();
                                         }
+                                        retryTime++;
                                     }).show();
 
                         }
@@ -204,13 +204,13 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                     new AlertDialog.Builder(this)
                             .setMessage(R.string.color_flash_liveness_failed)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
-                                retryTime++;
-                                if (retryTime > 1) {
+                            .setPositiveButton(retryTime > 2 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                                if (retryTime > 2) {
                                     finishFaceVerify(COLOR_LIVENESS_FAILED, R.string.color_flash_liveness_failed);
                                 } else {
                                     faceVerifyUtils.retryVerify();
                                 }
+                                retryTime++;
                             }).show();
                     break;
 
@@ -220,13 +220,13 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                     new AlertDialog.Builder(this)
                             .setView(dialogView)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
-                                retryTime++;
-                                if (retryTime > 1) {
+                            .setPositiveButton(retryTime > 2 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                                if (retryTime > 2) {
                                     finishFaceVerify(COLOR_LIVENESS_LIGHT_TOO_HIGH, R.string.color_flash_light_high);
                                 } else {
                                     faceVerifyUtils.retryVerify();
                                 }
+                                retryTime++;
                             }).show();
                     break;
 
@@ -243,13 +243,14 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                     new AlertDialog.Builder(this)
                             .setMessage(R.string.motion_liveness_detection_time_out)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.retry, (dialogInterface, i) -> {
-                                retryTime++;
-                                if (retryTime > 1) {
+                            .setPositiveButton(retryTime > 2 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                                if (retryTime > 2) {
                                     finishFaceVerify(MOTION_LIVENESS_TIMEOUT, R.string.face_verify_result_timeout);
                                 } else {
                                     faceVerifyUtils.retryVerify();
                                 }
+                                retryTime++;
+
                             }).show();
                     break;
 
@@ -297,10 +298,15 @@ public class LivenessDetectActivity extends AbsBaseActivity {
                 case NO_FACE_REPEATEDLY:
                     setMainTips(R.string.no_face_or_repeat_switch_screen);
                     new AlertDialog.Builder(this)
-                            .setMessage(R.string.stop_verify_tips)
+                            .setMessage(R.string.no_face_repeatedly)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.confirm, (dialogInterface, i) -> {
-                                finishFaceVerify(NO_FACE_MULTI, R.string.face_verify_result_no_face_multi_time);
+                            .setPositiveButton(retryTime > 2 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                                if (retryTime > 2) {
+                                    finishFaceVerify(NO_FACE_MULTI, R.string.face_verify_result_no_face_multi_time);
+                                } else {
+                                    faceVerifyUtils.retryVerify();
+                                }
+                                retryTime++;
                             }).show();
                     break;
 
