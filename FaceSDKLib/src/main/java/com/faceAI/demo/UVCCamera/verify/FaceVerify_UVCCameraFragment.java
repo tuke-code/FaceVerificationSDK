@@ -1,6 +1,5 @@
 package com.faceAI.demo.UVCCamera.verify;
 
-import static com.faceAI.demo.FaceSDKConfig.CACHE_FACE_LOG_DIR;
 import static com.faceAI.demo.SysCamera.verify.FaceVerificationActivity.USER_FACE_ID_KEY;
 
 import android.graphics.Bitmap;
@@ -226,7 +225,7 @@ public class FaceVerify_UVCCameraFragment extends AbsFaceVerify_UVCCameraFragmen
                     case NO_FACE_REPEATEDLY:
                         setMainTips(R.string.no_face_or_repeat_switch_screen);
                         new AlertDialog.Builder(requireActivity())
-                                .setMessage(R.string.stop_verify_tips)
+                                .setMessage(R.string.no_face_repeatedly)
                                 .setCancelable(false)
                                 .setPositiveButton(R.string.confirm, (dialogInterface, i) -> {
                                     requireActivity().finish();
