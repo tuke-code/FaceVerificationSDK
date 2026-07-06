@@ -216,7 +216,7 @@ public class FaceVerificationActivity extends AbsBaseActivity {
         if (isVerifyMatched&&(livenessValue>0.8||faceLivenessType.equals(FaceLivenessType.NONE))) {
             //2. 相似度>verifyThreshold，并且livenessValue>0.8
             //TTSPlayer.getInstance().playTTS(R.string.face_verify_success);
-            new ImageToast().show(getApplicationContext(), getString(R.string.face_verify_success));
+            //new ImageToast().show(getApplicationContext(), getString(R.string.face_verify_success));
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 finishFaceVerify(VERIFY_SUCCESS, R.string.face_verify_result_success, similarity,livenessValue);
             }, 500);
@@ -227,8 +227,8 @@ public class FaceVerificationActivity extends AbsBaseActivity {
             new AlertDialog.Builder(FaceVerificationActivity.this)
                     .setMessage(R.string.face_verify_result_failed)
                     .setCancelable(false)
-                    .setPositiveButton(retryTime > 3 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
-                        if (retryTime > 3) {
+                    .setPositiveButton(retryTime > 2 ? R.string.confirm : R.string.retry, (dialogInterface, i) -> {
+                        if (retryTime > 2) {
                             finishFaceVerify(code, R.string.face_verify_result_failed, similarity,livenessValue);
                         } else {
                             faceVerifyUtils.retryVerify();
